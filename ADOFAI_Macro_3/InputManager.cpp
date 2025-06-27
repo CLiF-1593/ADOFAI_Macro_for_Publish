@@ -127,32 +127,6 @@ void InputManager::SetInput(FileManager &file, BeatManager &beat) {
 	double hand_bpm = 0;
 
 	//Finger Allocation
-	/*
-	for (int i = 0; i < input_list.size() - 1; i++) {
-		hand_bpm = SetHandBPM(beat_list[i + 1].bpm / beat_list[i + 1].beat, beat_list[i + 1].bpm, hand_bpm);
-		double hand_speed = HandSpeed(hand_bpm) * hand_speed_coefficient;
-		double duration = this->input_list[i + 1].push_time - this->input_list[i].push_time;
-		hand_duration += duration;
-		if (hand_duration < hand_speed) {
-			this->input_list[i+1].finger = ++finger;
-			if (finger >= FingerNumber) {
-				for (int j = i + 1; this->input_list[j].finger; j--) {
-					this->input_list[j].finger = 0;				
-				}
-				i -= finger;
-				hand_speed_coefficient /= 2;
-				finger = 0;
-				hand_duration = 0;
-			}
-		}
-		else {
-			hand_speed_coefficient = 1.0;
-			hand_duration = 0;
-			finger = 0;
-		}
-	}
-	*/
-
 	bool reset_hand_speed_coefficient = false;
 	double prev_duration = 0;
 	for (int i = 0; i < input_list.size() - 1; i++) {
@@ -226,20 +200,6 @@ void InputManager::SetInput(FileManager &file, BeatManager &beat) {
 		}
 	}
 
-	/*double last_time = 0;
-	for (int i = 0; i < this->input_list.size(); i++) {
-		double interval = this->input_list[i].push_time - last_time;
-		interval *= KeyOffset;
-		if (interval > MaxPressSpeed) {
-			interval = MaxPressSpeed * pow(KeyOffset, (double)this->input_list[i].finger / 2.0);
-		}
-		this->input_list[i].release_time = this->input_list[i].push_time - interval + (PressRange ? rand() % (PressRange * 2) - PressRange : 0);
-		if (!this->input_list[i].finger) {
-			last_time = this->input_list[i].release_time + this->input_list[i].push_time;
-			last_time /= 2;
-		}
-	}*/
-	
 	//Release Time Modification (Hold)
 	bool hold_trigger = false;
 	int index = -1;
@@ -343,13 +303,8 @@ void InputManager::SetInput(FileManager &file, BeatManager &beat) {
 			}
 		}
 
-		//cout << beat_list[i].tile_num << "\t" << cur_beat;
-		//cout << beat_list[i].tile_num << "\t" << setprecision(6) << cur_beat << "\t" << setprecision(5) << beat_list[i].bpm << "\t" << setprecision(5) << beat_list[i].beat << "\t" << setprecision(5) << cur_bpm;
 		if (InBinary(cur_bpm, beat_list[i].bpm) || InBinary(cur_bpm, beat_list[i].bpm / beat_list[i].beat)) {
-			//cur_beat += beat_list[i].beat * beat_list[i].bpm / cur_bpm * 0.5 * (double)HandNumber;
 			cur_beat += cur_bpm / (beat_list[i].bpm / beat_list[i].beat) * 0.5 * (double)HandNumber;
-			//cur_bpm = beat_list[i].bpm / beat_list[i].beat;
-			//cout << "\t1";
 		}
 		else {
 			cur_beat += beat_list[i].beat * 0.5 * (double)HandNumber;
@@ -357,9 +312,7 @@ void InputManager::SetInput(FileManager &file, BeatManager &beat) {
 			cur_bpm = beat_list[i].bpm;
 			while (abs(cur_bpm - prev) > abs(cur_bpm * 2 - prev)) cur_bpm *= 2;
 			while (abs(cur_bpm - prev) > abs(cur_bpm * 0.5 - prev)) cur_bpm *= 0.5;
-			//cout << "\t2";
 		}
-		//cout << endl;
 		index++;
 	}
 	#endif
